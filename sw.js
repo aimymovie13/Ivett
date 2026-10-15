@@ -1,7 +1,7 @@
 'use strict';
 
 // Bump this version whenever any file in FILES changes.
-const VERSION = '2026-10-15-v1';
+const VERSION = '2026-10-15-v2';
 const SCOPE = new URL(self.registration.scope);
 const PREFIX = 'ivett-offline-' + encodeURIComponent(SCOPE.pathname) + '-';
 const CACHE_NAME = PREFIX + VERSION;

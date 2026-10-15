@@ -147,7 +147,8 @@
   }
 
   function offerUpdate() {
-    updateButton.hidden = !registration?.waiting;
+    updateButton.hidden = !(navigator.serviceWorker.controller && registration?.waiting &&
+      registration.waiting !== navigator.serviceWorker.controller);
   }
   updateButton.addEventListener('click', () => {
     if (!registration?.waiting) return;
@@ -173,13 +174,14 @@
         registration.addEventListener('updatefound', () => {
           const worker = registration.installing;
           worker?.addEventListener('statechange', () => {
-            if (worker.state === 'installed') offerUpdate();
+            if (worker.state === 'installed' || worker.state === 'activated') offerUpdate();
             if (worker.state === 'redundant' && !ready) setStatus(false, 'A letöltés megszakadt. Próbáld újra internetkapcsolattal.', true);
           });
         });
         offerUpdate();
         registration = await navigator.serviceWorker.ready;
         clearTimeout(watchdog);
+        offerUpdate();
         await checkOffline(true);
       } catch {
         clearTimeout(watchdog);
@@ -199,6 +201,7 @@
   });
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
+      offerUpdate();
       if (updating) location.reload();
       else void checkOffline();
     });
